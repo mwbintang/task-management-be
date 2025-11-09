@@ -6,6 +6,8 @@ import type { Application } from "express";
 import routes from "./index.routes.js";
 import { env } from "./constants/env"
 import { connectMongo } from "./config/mongo.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
+import { Request, Response } from "express";
 
 dotenv.config();
 
@@ -23,8 +25,13 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api", routes);
+app.use(errorHandler);
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
 
-const PORT = env.PORT ?? 3000;
+
+const PORT = env.PORT;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port: ${PORT}`);
 });
