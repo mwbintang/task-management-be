@@ -1,5 +1,6 @@
-import jwt, { JwtPayload } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import { env } from "../constants/env";
+import { CustomJwtPayload } from "../constants/types/jwt.type";
 
 /**
  * Generate a JWT token
@@ -11,7 +12,7 @@ export function signToken(payload: object): string {
 /**
  * Verify a JWT token
  */
-export function verifyToken(token: string): string | JwtPayload | null {
+export function verifyToken(token: string): string | CustomJwtPayload | null {
   try {
     return jwt.verify(token, env.JWT_SECRET);
   } catch (err) {
