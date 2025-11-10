@@ -1,23 +1,24 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { TicketStatus, TicketPriority, CriticalLevel } from "../constants/enums/ticket.enum";
 
 interface IAttachment {
   filename: string;
-  url: string; // could be S3, local, etc.
+  url: string;
   mimetype: string;
-  size?: number; // optional file size in bytes
+  size?: number;
 }
 
 export interface ITicket extends Document {
   title: string;
   description: string;
-  status: "backlog" | "in_progress" | "resolved" | "closed";
-  priority: "low" | "medium" | "high" | "critical";
-  criticalLevel: "L1" | "L2" | "L3";
+  status: TicketStatus;
+  priority: TicketPriority;
+  criticalLevel: CriticalLevel;
   project: Types.ObjectId;
   assignee?: Types.ObjectId;
   reporter: Types.ObjectId;
-  attachments: IAttachment[]; // 🧩 new field
-  comments: Types.ObjectId[]; // 🧩 comment refs
+  attachments: IAttachment[];
+  comments: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,18 +39,18 @@ const ticketSchema = new Schema<ITicket>(
     description: { type: String, required: true },
     status: {
       type: String,
-      enum: ["backlog", "in_progress", "resolved", "closed"],
-      default: "backlog",
+      enum: Object.values(TicketStatus),
+      default: TicketStatus.BACKLOG,
     },
     priority: {
       type: String,
-      enum: ["low", "medium", "high", "critical"],
-      default: "low",
+      enum: Object.values(TicketPriority),
+      default: TicketPriority.LOW,
     },
     criticalLevel: {
       type: String,
-      enum: ["L1", "L2", "L3"],
-      default: "L1",
+      enum: Object.values(CriticalLevel),
+      default: CriticalLevel.L1,
     },
     project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
     assignee: { type: Schema.Types.ObjectId, ref: "User" },

@@ -9,7 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": [
     "src"
