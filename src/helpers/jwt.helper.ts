@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import { env } from "../constants/env";
-import { CustomJwtPayload } from "../constants/types/jwt.type";
+import { CustomJwtPayload } from "../types/jwt";
 
 /**
  * Generate a JWT token

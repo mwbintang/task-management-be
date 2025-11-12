@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 
 const router = Router();
 
-// Public routes
 router.post('/login', UserController.login);
+router.get('/', UserController.getAll);
 
 export default router; 
