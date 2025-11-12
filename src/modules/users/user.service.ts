@@ -18,4 +18,8 @@ export class UserService {
     const token = signToken({ userId: user._id, role: user.role });
     return { token, user };
   }
+
+  static async getAll() {
+    return User.find();
+  }
 }

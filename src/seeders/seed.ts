@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { env } from "../constants/env";
-import { User } from "../models/user.model";
-import { Project } from "../models/project.model";
-import { Ticket } from "../models/ticket.model";
-import { Comment } from "../models/comment.model";
-import { TicketLog } from "../models/ticket-log.model";
+import { User, Project, ProjectUser, Ticket, Comment, TicketLog } from "../models";
 
 async function seed() {
   try {
@@ -15,6 +11,7 @@ async function seed() {
     // --- Clear existing data ---
     await User.deleteMany({});
     await Project.deleteMany({});
+    await ProjectUser.deleteMany({});
     await Ticket.deleteMany({});
     await Comment.deleteMany({});
     await TicketLog.deleteMany({});
@@ -22,20 +19,54 @@ async function seed() {
 
     // --- Create Users ---
     const users = await User.insertMany([
-      { name: "Alice L1", email: "alice@example.com", password: await bcrypt.hash("password123", 10), role: "L1" },
-      { name: "Bob L2", email: "bob@example.com", password: await bcrypt.hash("password123", 10), role: "L2" },
-      { name: "Charlie L3", email: "charlie@example.com", password: await bcrypt.hash("password123", 10), role: "L3" },
+      {
+        name: "Alice L1",
+        email: "alice@example.com",
+        password: await bcrypt.hash("password123", 10),
+        role: "L1",
+      },
+      {
+        name: "Bob L2",
+        email: "bob@example.com",
+        password: await bcrypt.hash("password123", 10),
+        role: "L2",
+      },
+      {
+        name: "Charlie L3",
+        email: "charlie@example.com",
+        password: await bcrypt.hash("password123", 10),
+        role: "L3",
+      },
     ]);
     console.log("👤 Users created");
 
     // --- Create Projects ---
     const projects = await Project.insertMany([
-      { name: "Project Alpha", description: "First test project" },
-      { name: "Project Beta", description: "Second test project" },
+      {
+        name: "Project Alpha",
+        description: "First test project",
+      },
+      {
+        name: "Project Beta",
+        description: "Second test project",
+      },
     ]);
     console.log("📁 Projects created");
 
+    // --- Connect Users and Projects (many-to-many) ---
+    await ProjectUser.insertMany([
+      // Project Alpha: Alice (owner), Bob (member)
+      { user: users[0]._id, project: projects[0]._id, role: "owner" },
+      { user: users[1]._id, project: projects[0]._id, role: "member" },
+
+      // Project Beta: Bob (owner), Charlie (member)
+      { user: users[1]._id, project: projects[1]._id, role: "owner" },
+      { user: users[2]._id, project: projects[1]._id, role: "member" },
+    ]);
+    console.log("🔗 ProjectUser relations created");
+
     // --- Create Tickets ---
+    const now = new Date();
     const tickets = await Ticket.insertMany([
       {
         title: "Login issue",
@@ -48,11 +79,12 @@ async function seed() {
         assignee: users[0]._id,
         attachments: [],
         comments: [],
+        expectedDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
       },
       {
         title: "Payment page error",
         description: "Checkout button not working",
-        status: "backlog",
+        status: "todo",
         priority: "medium",
         criticalLevel: "L2",
         project: projects[1]._id,
@@ -60,25 +92,50 @@ async function seed() {
         assignee: users[1]._id,
         attachments: [],
         comments: [],
+        expectedDate: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000),
       },
     ]);
     console.log("🎫 Tickets created");
 
     // --- Create Comments ---
     const comments = await Comment.insertMany([
-      { user: users[0]._id, ticket: tickets[0]._id, message: "Initial comment on ticket 1" },
-      { user: users[1]._id, ticket: tickets[1]._id, message: "Follow-up comment on ticket 2" },
+      {
+        user: users[0]._id,
+        ticket: tickets[0]._id,
+        message: "Initial comment on ticket 1",
+      },
+      {
+        user: users[1]._id,
+        ticket: tickets[1]._id,
+        message: "Follow-up comment on ticket 2",
+      },
     ]);
     console.log("💬 Comments created");
 
-    // --- Update tickets to reference comments ---
-    await Ticket.updateOne({ _id: tickets[0]._id }, { $push: { comments: comments[0]._id } });
-    await Ticket.updateOne({ _id: tickets[1]._id }, { $push: { comments: comments[1]._id } });
+    // --- Update tickets with comment references ---
+    await Ticket.updateOne(
+      { _id: tickets[0]._id },
+      { $push: { comments: comments[0]._id } }
+    );
+    await Ticket.updateOne(
+      { _id: tickets[1]._id },
+      { $push: { comments: comments[1]._id } }
+    );
 
     // --- Create Ticket Logs ---
     await TicketLog.insertMany([
-      { ticket: tickets[0]._id, performedBy: users[0]._id, action: "Created", notes: "Initial ticket created" },
-      { ticket: tickets[1]._id, performedBy: users[1]._id, action: "Created", notes: "Initial ticket created" },
+      {
+        ticket: tickets[0]._id,
+        performedBy: users[0]._id,
+        action: "Created",
+        note: "Initial ticket created",
+      },
+      {
+        ticket: tickets[1]._id,
+        performedBy: users[1]._id,
+        action: "Created",
+        note: "Initial ticket created",
+      },
     ]);
     console.log("📝 Ticket logs created");
 

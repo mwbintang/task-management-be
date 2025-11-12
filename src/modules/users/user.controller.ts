@@ -13,4 +13,14 @@ export class UserController {
             handleError(res, error);
         }
     }
+
+    static async getAll(req: Request, res: Response){
+        try {
+            const result = await UserService.getAll();
+
+            res.json({ success: true, data: result });
+        } catch (error) {
+            handleError(res, error);
+        }
+    }
 }

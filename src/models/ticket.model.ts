@@ -19,6 +19,7 @@ export interface ITicket extends Document {
   reporter: Types.ObjectId;
   attachments: IAttachment[];
   comments: Types.ObjectId[];
+  expectedDate?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +58,7 @@ const ticketSchema = new Schema<ITicket>(
     reporter: { type: Schema.Types.ObjectId, ref: "User", required: true },
     attachments: [attachmentSchema],
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    expectedDate: { type: Date },
   },
   { timestamps: true }
 );

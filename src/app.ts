@@ -30,7 +30,6 @@ app.use((req: Request, res: Response) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 
-
 const PORT = env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);
