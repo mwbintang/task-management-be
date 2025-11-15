@@ -6,6 +6,7 @@ import multer from 'multer';
 const router = Router();
 
 router.get('/', TicketController.fetchAll);
+router.get('/:id', TicketController.fetchById);
 router.post(
   "/",
   (req: Request, res: Response, next: NextFunction) => {
@@ -23,5 +24,6 @@ router.post(
   }
 );
 router.patch('/:id/status', TicketController.updateStatus);
+router.patch('/:id/level', TicketController.updateTicketLevel);
 
 export default router; 

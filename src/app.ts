@@ -8,6 +8,8 @@ import { env } from "./constants/env"
 import { connectMongo } from "./config/mongo.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { Request, Response } from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -23,6 +25,13 @@ connectMongo();
 app.get('/', (req, res) => {
   res.json({ message: 'Hello World!' });
 });
+
+// Needed for ES module paths
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Serve uploads folder statically
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api", routes);
 app.use(errorHandler);
