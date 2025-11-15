@@ -42,24 +42,16 @@ async function seed() {
 
     // --- Create Projects ---
     const projects = await Project.insertMany([
-      {
-        name: "Project Alpha",
-        description: "First test project",
-      },
-      {
-        name: "Project Beta",
-        description: "Second test project",
-      },
+      { name: "Project Alpha", description: "First test project" },
+      { name: "Project Beta", description: "Second test project" },
     ]);
     console.log("📁 Projects created");
 
-    // --- Connect Users and Projects (many-to-many) ---
+    // --- Connect Users & Projects ---
     await ProjectUser.insertMany([
-      // Project Alpha: Alice (owner), Bob (member)
       { user: users[0]._id, project: projects[0]._id, role: "owner" },
       { user: users[1]._id, project: projects[0]._id, role: "member" },
 
-      // Project Beta: Bob (owner), Charlie (member)
       { user: users[1]._id, project: projects[1]._id, role: "owner" },
       { user: users[2]._id, project: projects[1]._id, role: "member" },
     ]);
@@ -71,9 +63,11 @@ async function seed() {
       {
         title: "Login issue",
         description: "User cannot login with correct password",
-        status: "backlog",
+        category: "bug",
+        status: "new",
         priority: "high",
-        criticalLevel: "L1",
+        criticalLevel: null,       // L1 cannot set this
+        level: "L1",
         project: projects[0]._id,
         reporter: users[0]._id,
         assignee: users[0]._id,
@@ -84,9 +78,11 @@ async function seed() {
       {
         title: "Payment page error",
         description: "Checkout button not working",
-        status: "todo",
+        category: "feature",
+        status: "new",
         priority: "medium",
-        criticalLevel: "L2",
+        criticalLevel: "C2",       // only L2 sets this
+        level: "L2",
         project: projects[1]._id,
         reporter: users[1]._id,
         assignee: users[1]._id,
@@ -112,7 +108,7 @@ async function seed() {
     ]);
     console.log("💬 Comments created");
 
-    // --- Update tickets with comment references ---
+    // Attach comments
     await Ticket.updateOne(
       { _id: tickets[0]._id },
       { $push: { comments: comments[0]._id } }

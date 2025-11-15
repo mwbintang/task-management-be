@@ -13,9 +13,29 @@ export class TicketController {
         }
     }
 
+    static async fetchById(req: Request, res: Response) {
+        try {
+            const result = await TicketService.fetchById(req.params.id);
+
+            res.json({ success: true, data: result });
+        } catch (error) {
+            handleError(res, error);
+        }
+    }
+
     static async updateStatus(req: Request, res: Response) {
         try {
             const result = await TicketService.updateStatus(req.params.id, req.body.status, req.user?._id);
+
+            res.json({ success: true, data: result });
+        } catch (error) {
+            handleError(res, error);
+        }
+    }
+
+    static async updateTicketLevel(req: Request, res: Response) {
+        try {
+            const result = await TicketService.updateTicketLevel(req.params.id, req.body, req.user?._id);
 
             res.json({ success: true, data: result });
         } catch (error) {
@@ -39,7 +59,8 @@ export class TicketController {
                 reporter: req.user?._id,
                 attachments,
             };
-            const result = await TicketService.create(ticketData);
+
+            const result = await TicketService.create(ticketData, req.user?._id);
 
             res.json({ success: true, data: result });
         } catch (error) {

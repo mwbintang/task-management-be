@@ -1,12 +1,12 @@
 import { Schema, model, Document, Types } from "mongoose";
-import { CriticalLevel } from "../constants/enums/ticket.enum";
+import { TicketLevel } from "../constants/enums/ticket.enum";
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
   name: string;
   email: string;
   password: string;
-  role: CriticalLevel;
+  role: TicketLevel;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,8 +18,8 @@ const userSchema = new Schema<IUser>(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: Object.values(CriticalLevel),
-      default: CriticalLevel.L1,
+      enum: Object.values(TicketLevel),
+      default: TicketLevel.L1,
     },
   },
   { timestamps: true }

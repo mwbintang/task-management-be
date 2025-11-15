@@ -3,4 +3,5 @@ export interface FetchAllParams {
   status?: string;
   priority?: string;
   escalation?: string;
+  category?: string;
 };
